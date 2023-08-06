@@ -1,0 +1,9 @@
+fix friction #
+tiles #
+add platforms
+main menu #
+pause menu
+high score
+usernames
+ending the game
+showing global high scores
