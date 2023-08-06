@@ -1,0 +1,4 @@
+repository "Golf Foddian Game@owinterh_icloud_com@cloud"
+  path "/"
+    br "/main"
+    co "/main"
