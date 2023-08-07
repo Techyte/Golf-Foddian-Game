@@ -1,25 +1,38 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public class BallArrowManager : MonoBehaviour
 {
     [SerializeField] private GolfBallController controller;
-
-    [SerializeField] private float maxPowerLength;
-
+    [SerializeField] private List<Sprite> arrowSprites;
+    [SerializeField] private SpriteRenderer spriteRenderer;
+    [SerializeField] private float posOffset = 3.5f;
+    
     private void Update()
     {
-        if(!PauseMenu.Instance._isOn)
+        if(!PauseMenu.Instance._isOn && controller.dir.magnitude > 0)
         {
-            float XScale = controller.dir.magnitude / controller.MaxPushForce * maxPowerLength;
+            float percentageOfMax = controller.dir.magnitude / controller.MaxPushForce;
             
-            transform.localScale = new Vector3(XScale, transform.localScale.y, 0);
+            int id = (int)(percentageOfMax * arrowSprites.Count);
+            if (id >= arrowSprites.Count)
+            {
+                id = arrowSprites.Count - 1;
+            }
 
+            spriteRenderer.sprite = arrowSprites[id];
+
+            transform.localPosition = Vector3.zero;
+            
             var angle = Mathf.Atan2(controller.dir.y, controller.dir.x) * Mathf.Rad2Deg;
             transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+
+            Debug.Log(transform.forward);
+            transform.localPosition = transform.forward * posOffset;
         }
         else
         {
-            transform.localScale = new Vector3(0, transform.localScale.y, 0);
+            spriteRenderer.sprite = null;
         }
     }
 }
