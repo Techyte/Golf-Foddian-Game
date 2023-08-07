@@ -14,21 +14,18 @@ public class BallArrowManager : MonoBehaviour
         {
             float percentageOfMax = controller.dir.magnitude / controller.MaxPushForce;
             
-            int id = (int)(percentageOfMax * arrowSprites.Count);
+            int id = Mathf.FloorToInt(percentageOfMax * arrowSprites.Count);
             if (id >= arrowSprites.Count)
             {
                 id = arrowSprites.Count - 1;
             }
 
             spriteRenderer.sprite = arrowSprites[id];
-
-            transform.localPosition = Vector3.zero;
             
             var angle = Mathf.Atan2(controller.dir.y, controller.dir.x) * Mathf.Rad2Deg;
-            transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
+            transform.rotation = Quaternion.AngleAxis(angle - 90, Vector3.forward);
 
-            Debug.Log(transform.forward);
-            transform.localPosition = transform.forward * posOffset;
+            transform.localPosition = controller.dir.normalized * posOffset;
         }
         else
         {

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody2D))]
@@ -7,6 +8,14 @@ public class GolfBallController : MonoBehaviour
     [SerializeField] private float maxPushForce = 10;
     [SerializeField] private float currentVelBonusMultiplier = 0.3f;
     [SerializeField] private Camera cam;
+    [SerializeField] private float mouseDistanceAtMax= 10;
+    [SerializeField] private float sandStayTime = 2f;
+    [SerializeField] private float sandFallSpeed = 1f;
+    [SerializeField] private List<AudioSource> ballHitSounds;
+    [SerializeField] private List<AudioSource> ballBounceSounds;
+    [SerializeField] private float bounceForce = 20;
+
+    public int ballHits;
 
     public float MaxPushForce => maxPushForce;
 
@@ -14,8 +23,14 @@ public class GolfBallController : MonoBehaviour
 
     private bool _canHit;
     private bool _colliding;
+    private bool _onSand;
+    private bool _fallingThroughSand;
     private Vector2 _mouseStartPos;
 
+    private Collider2D currentSandCollider;
+
+    private float sandTimer;
+    
     public Vector2 MousePosition => cam.ScreenToWorldPoint(Input.mousePosition);
 
     public Vector2 dir;
@@ -27,29 +42,78 @@ public class GolfBallController : MonoBehaviour
 
     private void Update()
     {
+        if (_onSand)
+        {
+            sandTimer += Time.deltaTime;
+        }
+        else
+        {
+            sandTimer = 0;
+        }
+
+        if (sandTimer > sandStayTime && currentSandCollider.isTrigger)
+        {
+            Debug.Log("falling");
+            currentSandCollider.isTrigger = true;
+            _canHit = false;
+            transform.position = new Vector3(transform.position.x, transform.position.y - sandFallSpeed * Time.deltaTime, 0);
+            _fallingThroughSand = true;
+        }
+        else if (sandTimer > sandStayTime && !currentSandCollider.isTrigger)
+        {
+            currentSandCollider.isTrigger = true;
+        }
+        else
+        {
+            _fallingThroughSand = false;
+            if(currentSandCollider)
+            {
+                currentSandCollider.isTrigger = false;
+            }
+        }
+        
         if (Input.GetMouseButtonDown(0))
         {
             _mouseStartPos = MousePosition;
         }
         
-        if(_canHit && !PauseMenu.Instance._isOn)
+        if(_canHit && !PauseMenu.Instance._isOn && rb.velocity.y >= 0)
         {
             if (Input.GetMouseButtonUp(0))
             {
                 PushBall();
+                PlayHitSound();
             }
         }
 
         if(Input.GetMouseButton(0))
         {
-            dir = (_mouseStartPos - MousePosition) / 100;
+            dir = _mouseStartPos - MousePosition;
+
+            float percentage = dir.magnitude / mouseDistanceAtMax;
+
+            if (percentage > 1)
+            {
+                percentage = 1;
+            }
+
+            dir = dir.normalized * (maxPushForce * percentage);
         }
         else
         {
             dir = Vector2.zero;
         }
-        
-        dir = Vector2.ClampMagnitude(dir, maxPushForce);
+    }
+
+    private void PlayHitSound()
+    {
+        int id = Random.Range(0, ballHitSounds.Count);
+        ballHitSounds[id].Play();
+    }
+
+    private void PlayBounce()
+    {
+        ballBounceSounds[0].Play();
     }
 
     private void FixedUpdate()
@@ -69,6 +133,11 @@ public class GolfBallController : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D collision)
     {
+        if (collision.CompareTag("Sand"))
+        {
+            _onSand = false;
+        }
+        
         _canHit = false;
     }
 
@@ -79,29 +148,71 @@ public class GolfBallController : MonoBehaviour
     
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        _colliding = true;
+        if (collision.gameObject.CompareTag("Sand"))
+        {
+            _onSand = true;
+            currentSandCollider = collision.collider;
+        }
+
+        if (!collision.gameObject.CompareTag("Ice"))
+        {
+            _colliding = true;   
+        }
+
+        if (collision.gameObject.CompareTag("Bounce"))
+        {
+            rb.velocity = new Vector2(rb.velocity.x, -rb.velocity.y * bounceForce);
+            Debug.Log(rb.velocity);
+        }
+
+        if (rb.velocity.y > rb.velocity.x)
+        {
+            PlayBounce();
+        }
     }
 
     private void OnCollisionExit2D(Collision2D collision)
     {
+        if (collision.gameObject.CompareTag("Sand"))
+        {
+            _onSand = false;
+        }
         _colliding = false;
     }
 
     private void OnCollisionStay2D(Collision2D collision)
     {
-        _colliding = true;
+        if (collision.gameObject.CompareTag("Sand"))
+        {
+            _onSand = true;
+            currentSandCollider = collision.collider;
+        }
+        if(!_fallingThroughSand)
+        {
+            _colliding = true;
+        }
     }
 
     #endregion
 
     private void PushBall()
     {
-        Debug.Log(dir.magnitude);
-
+        ballHits++;
+        
         float mag = dir.magnitude;
         
         dir.Normalize();
         
         rb.velocity = pushForce * mag * dir + (rb.velocity * currentVelBonusMultiplier);
+    }
+
+    public void SetCanHit(bool value)
+    {
+        _canHit = value;
+        if (!value)
+        {
+            rb.gravityScale = 0;
+            rb.velocity = Vector2.zero;
+        }
     }
 }
