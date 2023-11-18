@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 [RequireComponent(typeof(Rigidbody2D))]
 public class GolfBallController : MonoBehaviour
@@ -9,8 +10,6 @@ public class GolfBallController : MonoBehaviour
     [SerializeField] private float currentVelBonusMultiplier = 0.3f;
     [SerializeField] private Camera cam;
     [SerializeField] private float mouseDistanceAtMax= 10;
-    [SerializeField] private float sandStayTime = 2f;
-    [SerializeField] private float sandFallSpeed = 1f;
     [SerializeField] private List<AudioSource> ballHitSounds;
     [SerializeField] private List<AudioSource> ballBounceSounds;
     [SerializeField] private float bounceForce = 20;
@@ -23,15 +22,10 @@ public class GolfBallController : MonoBehaviour
 
     private bool _canHit;
     private bool _colliding;
-    private bool _onSand;
     private bool _fallingThroughSand;
     private Vector2 _mouseStartPos;
 
-    private Collider2D currentSandCollider;
-
-    private float sandTimer;
-    
-    public Vector2 MousePosition => cam.ScreenToWorldPoint(Input.mousePosition);
+    private Vector2 MousePosition => cam.ScreenToWorldPoint(Input.mousePosition);
 
     public Vector2 dir;
 
@@ -40,38 +34,13 @@ public class GolfBallController : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
     }
 
+    private void Start()
+    {
+        mouseDistanceAtMax = PlayerPrefs.GetFloat("MouseDistanceAtMax");
+    }
+
     private void Update()
     {
-        if (_onSand)
-        {
-            sandTimer += Time.deltaTime;
-        }
-        else
-        {
-            sandTimer = 0;
-        }
-
-        if (sandTimer > sandStayTime && currentSandCollider.isTrigger)
-        {
-            Debug.Log("falling");
-            currentSandCollider.isTrigger = true;
-            _canHit = false;
-            transform.position = new Vector3(transform.position.x, transform.position.y - sandFallSpeed * Time.deltaTime, 0);
-            _fallingThroughSand = true;
-        }
-        else if (sandTimer > sandStayTime && !currentSandCollider.isTrigger)
-        {
-            currentSandCollider.isTrigger = true;
-        }
-        else
-        {
-            _fallingThroughSand = false;
-            if(currentSandCollider)
-            {
-                currentSandCollider.isTrigger = false;
-            }
-        }
-        
         if (Input.GetMouseButtonDown(0))
         {
             _mouseStartPos = MousePosition;
@@ -133,11 +102,6 @@ public class GolfBallController : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        if (collision.CompareTag("Sand"))
-        {
-            _onSand = false;
-        }
-        
         _canHit = false;
     }
 
@@ -148,15 +112,9 @@ public class GolfBallController : MonoBehaviour
     
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("Sand"))
-        {
-            _onSand = true;
-            currentSandCollider = collision.collider;
-        }
-
         if (!collision.gameObject.CompareTag("Ice"))
         {
-            _colliding = true;   
+            _colliding = true;
         }
 
         if (collision.gameObject.CompareTag("Bounce"))
@@ -173,24 +131,12 @@ public class GolfBallController : MonoBehaviour
 
     private void OnCollisionExit2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("Sand"))
-        {
-            _onSand = false;
-        }
         _colliding = false;
     }
 
     private void OnCollisionStay2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag("Sand"))
-        {
-            _onSand = true;
-            currentSandCollider = collision.collider;
-        }
-        if(!_fallingThroughSand)
-        {
-            _colliding = true;
-        }
+        _colliding = true;
     }
 
     #endregion

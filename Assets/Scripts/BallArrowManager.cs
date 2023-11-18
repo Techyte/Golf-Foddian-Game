@@ -13,11 +13,25 @@ public class BallArrowManager : MonoBehaviour
         if(!PauseMenu.Instance._isOn && controller.dir.magnitude > 0)
         {
             float percentageOfMax = controller.dir.magnitude / controller.MaxPushForce;
+
+            if (percentageOfMax > 1)
+            {
+                percentageOfMax = 1;
+            }
+
+            int id = 0;
             
-            int id = Mathf.FloorToInt(percentageOfMax * arrowSprites.Count);
-            if (id >= arrowSprites.Count)
+            if (percentageOfMax >= 0.99)
             {
                 id = arrowSprites.Count - 1;
+            }
+            else
+            {
+                id = Mathf.CeilToInt(percentageOfMax * arrowSprites.Count-1);
+                if (id == 4)
+                {
+                    id = 3;
+                }
             }
 
             spriteRenderer.sprite = arrowSprites[id];
