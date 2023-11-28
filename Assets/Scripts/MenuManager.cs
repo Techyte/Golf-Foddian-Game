@@ -9,6 +9,8 @@ public class MenuManager : MonoBehaviour
     [SerializeField] private GameObject mainMenu;
     [SerializeField] private GameObject aboutMenu;
     [SerializeField] private GameObject optionsMenu;
+    [SerializeField] private Image backgroundImage;
+    [SerializeField] private float scrollSpeed = 1f;
     
     [Space]
     [Header("Main Menu Assignments")]
@@ -24,10 +26,18 @@ public class MenuManager : MonoBehaviour
         string username = PlayerPrefs.GetString("Username", "Guest");
         int mouseDistanceAtMax = PlayerPrefs.GetInt("MouseDistanceAtMax", 8);
 
+        usernameInputField.contentType = TMP_InputField.ContentType.Standard;
         usernameInputField.text = username;
         usernameInputField.onValueChanged.AddListener(UsernameChanged);
         MouseDistanceAtMax.value = mouseDistanceAtMax;
         MouseDistanceAtMax.onValueChanged.AddListener(DistanceChanged);
+
+        backgroundImage.material = new Material(backgroundImage.material);
+    }
+
+    private void LateUpdate()
+    {
+        backgroundImage.material.mainTextureOffset += new Vector2(0f, Time.deltaTime * (-scrollSpeed / 10));
     }
 
     public void UsernameChanged(string value)
