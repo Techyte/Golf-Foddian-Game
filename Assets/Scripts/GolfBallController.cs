@@ -41,12 +41,12 @@ public class GolfBallController : MonoBehaviour
 
     private void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) && !FinishLine.Finished)
         {
             _mouseStartPos = MousePosition;
         }
         
-        if(_canHit && !PauseMenu.Instance._isOn && rb.velocity.y >= 0)
+        if(_canHit && !PauseMenu.Instance._isOn && rb.velocity.y >= 0 && !FinishLine.Finished)
         {
             if (Input.GetMouseButtonUp(0))
             {
@@ -55,7 +55,7 @@ public class GolfBallController : MonoBehaviour
             }
         }
 
-        if(Input.GetMouseButton(0))
+        if(Input.GetMouseButton(0) && !FinishLine.Finished)
         {
             dir = _mouseStartPos - MousePosition;
 

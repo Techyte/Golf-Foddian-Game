@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using LootLocker.Requests;
 using TMPro;
@@ -9,17 +10,16 @@ public class FinishLine : MonoBehaviour
     [SerializeField] private GolfBallController controller;
     [SerializeField] private GameObject finishUI;
     [SerializeField] private TextMeshProUGUI finishedTimeText;
-    [SerializeField] private int defaultScore = 10000;
 
     [SerializeField] private List<GameObject> leaderBoardPlaces;
 
     private float time;
 
-    private bool finished;
+    public static bool Finished;
 
     private void Update()
     {
-        if(!finished)
+        if(!Finished)
         {
             time += Time.deltaTime;
         }
@@ -32,7 +32,7 @@ public class FinishLine : MonoBehaviour
 
     private void Finish()
     {
-        finished = true;
+        Finished = true;
         controller.SetCanHit(false);
         finishUI.SetActive(true);
         SendScore();
@@ -42,9 +42,12 @@ public class FinishLine : MonoBehaviour
     {
         string memberID = "";
         string leaderBoardKey = "mainLeaderBoardKeyHere";
-        int score = CalculateScore(time);
+
+        int storedTime = (int)(time * 1000);
         
-        LootLockerSDKManager.SubmitScore(memberID, score, leaderBoardKey, (response) =>
+        Debug.Log(storedTime);
+
+        LootLockerSDKManager.SubmitScore(memberID, -storedTime, leaderBoardKey, (response) =>
         {
             if (response.statusCode == 200)
             {
@@ -70,7 +73,11 @@ public class FinishLine : MonoBehaviour
         
         for (int i = 0; i < members.Length; i++)
         {
-            LeaderBoardPosition position = new LeaderBoardPosition(members[i].player.name, members[i].score, i+1);
+            Debug.Log(members[i].score);
+            float convertedTime = members[i].score / 1000f;
+            Debug.Log(convertedTime);
+            
+            LeaderBoardPosition position = new LeaderBoardPosition(members[i].player.name, -convertedTime, i+1);
             positions.Add(position);
         }
         
@@ -92,14 +99,6 @@ public class FinishLine : MonoBehaviour
         }
     }
 
-    private int CalculateScore(float time)
-    {
-        float adjustedTime = time * 15;
-        float adjustedBallHits = controller.ballHits * 8;
-
-        return (int)(defaultScore - adjustedBallHits * adjustedTime);
-    }
-    
     private void GetLeaderboard()
     {
         string leaderBoardKey = "mainLeaderBoardKeyHere";

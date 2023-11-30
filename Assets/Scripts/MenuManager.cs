@@ -37,7 +37,7 @@ public class MenuManager : MonoBehaviour
 
     private void LateUpdate()
     {
-        backgroundImage.material.mainTextureOffset += new Vector2(0f, Time.deltaTime * (scrollSpeed / 10));
+        backgroundImage.material.mainTextureOffset += new Vector2(0, Time.deltaTime * (scrollSpeed / 10));
     }
 
     public void UsernameChanged(string value)
