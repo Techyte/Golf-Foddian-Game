@@ -27,7 +27,14 @@ public class FinishLine : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D col)
     {
-        Finish();
+        if (NetworkManager.Instance.playingOnline)
+        {
+            col.transform.position = PlayerManager.Instace.PlayerStartPosition.position;
+        }
+        else
+        {
+            Finish();
+        }
     }
 
     private void Finish()

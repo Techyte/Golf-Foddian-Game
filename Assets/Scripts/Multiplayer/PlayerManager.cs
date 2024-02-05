@@ -15,6 +15,8 @@ public class PlayerManager : MonoBehaviour
     
     private Dictionary<ushort, NetworkPlayer> _players = new Dictionary<ushort, NetworkPlayer>();
 
+    public Transform PlayerStartPosition => playerStartPosition;
+
     public ushort port;
     
     private void Awake()
