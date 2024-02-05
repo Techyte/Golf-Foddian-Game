@@ -39,7 +39,7 @@ public class MenuManager : MonoBehaviour
         backgroundImage.material = new Material(backgroundImage.material);
         
         string username = PlayerPrefs.GetString("Username", "Guest");
-        int mouseDistanceAtMax = PlayerPrefs.GetInt("MouseDistanceAtMax", 8);
+        float mouseDistanceAtMax = PlayerPrefs.GetFloat("MouseDistanceAtMax", 8);
         float volume = PlayerPrefs.GetFloat("Volume", 0.5f);
         bool music = PlayerPrefs.GetInt("Music", 1) == 1;
         bool soundEffects = PlayerPrefs.GetInt("SoundEffects", 1) == 1;

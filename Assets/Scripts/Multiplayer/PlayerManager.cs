@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using Riptide;
 using TMPro;
@@ -11,10 +10,12 @@ public class PlayerManager : MonoBehaviour
 
     [SerializeField] private Transform playerStartPosition;
     [SerializeField] private NetworkPlayer proxyPlayer;
-    [SerializeField] private Transform localPlayer;
+    [SerializeField] private NetworkPlayer localPlayer;
     [SerializeField] private TextMeshProUGUI portDisplay;
     
     private Dictionary<ushort, NetworkPlayer> _players = new Dictionary<ushort, NetworkPlayer>();
+
+    public ushort port;
     
     private void Awake()
     {
@@ -23,46 +24,65 @@ public class PlayerManager : MonoBehaviour
 
     private void Start()
     {
-        portDisplay.text = NetworkManager.Instance.server.Port.ToString();
+        if (NetworkManager.Instance.host)
+        {
+            portDisplay.text = NetworkManager.Instance.server.Port.ToString();
+        }
+
+        localPlayer.username.text = PlayerPrefs.GetString("Username", "Guest");
     }
 
     private void Update()
     {
         SendLocationAsClient();
+        
+        if (!NetworkManager.Instance.host)
+        {
+            portDisplay.text = port.ToString();
+        }
     }
 
     public void SendLocationAsClient()
     {
         Message message = Message.Create(MessageSendMode.Unreliable, PlayerToServer.Location);
 
-        message.AddVector2(localPlayer.position);
+        message.AddVector2(localPlayer.transform.position);
 
         NetworkManager.Instance.client.Send(message);
     }
 
     public void SelfConnected(ushort id)
     {
-        _players.Add(id, localPlayer.GetComponent<NetworkPlayer>());
+        Debug.Log("adding self to players");
+        localPlayer.id = id;
+        localPlayer.username.text = PlayerPrefs.GetString("Username", "Guest");
+        _players.Add(id, localPlayer);
+        Debug.Log($"Adding {id} to players");
     }
 
     public void SendCurrentPlayers(ushort id)
     {
+        Debug.Log("sending list of players");
         Message message = Message.Create(MessageSendMode.Reliable, ServerToPlayer.CurrentPlayers);
 
-        NetworkPlayerData[] playerData = new NetworkPlayerData[_players.Count];
+        Debug.Log(_players.Count);
+        
+        List<NetworkPlayerData> playerData = new List<NetworkPlayerData>();
 
-        for (int i = 0; i < _players.Count; i++)
+        foreach (var player in _players.Values)
         {
-            if (_players.TryGetValue((ushort)i, out NetworkPlayer player))
-            {
-                playerData[i].id = player.id;
-                playerData[i].position = player.transform.position;
-            }
+            NetworkPlayerData data = new NetworkPlayerData();
+            
+            data.id = player.id;
+            data.position = player.transform.position;
+            data.username = player.username.text;
+            
+            playerData.Add(data);
         }
 
-        message.AddPlayerInfos(playerData);
+        message.AddPlayerInfos(playerData.ToArray());
 
-        NetworkManager.Instance.server.Send(message, id);
+        NetworkManager.Instance.server.Send(message, id); 
     }
     
     public void PlayerLeft(ushort id)
@@ -92,12 +112,27 @@ public class PlayerManager : MonoBehaviour
     
     public void HandleCurrentPlayers(NetworkPlayerData[] datas)
     {
+        Debug.Log("setuping up existing players");
         for (int i = 0; i < datas.Length; i++)
         {
-            ushort id = datas[i].id;
-            NetworkPlayer newPlayer = Instantiate(proxyPlayer, datas[i].position, quaternion.identity, transform);
+            Debug.Log("setuping up AN existing player");
+            Debug.Log(datas[i].id);
+            if (!_players.ContainsKey(datas[i].id))
+            {
+                Debug.Log(datas[i].username);
+                ushort id = datas[i].id;
+                NetworkPlayer newPlayer = Instantiate(proxyPlayer, datas[i].position, quaternion.identity, transform);
+                newPlayer.username.text = datas[i].username;
+                newPlayer.id = id;
             
-            _players.Add(id, newPlayer);
+                _players.Add(id, newPlayer);
+                Debug.Log($"Adding {id} to players");
+            }
+        }
+
+        if (!NetworkManager.Instance.host)
+        {
+            SelfConnected(NetworkManager.Instance.client.Id);   
         }
     }
 
@@ -107,6 +142,15 @@ public class PlayerManager : MonoBehaviour
         NetworkPlayer newPlayer = Instantiate(proxyPlayer, message.GetVector2(), quaternion.identity, transform);
         
         _players.Add(id, newPlayer);
+        Debug.Log($"Adding {id} to players");
+    }
+
+    public void SetPlayerUsername(ushort id, string username)
+    {
+        if (_players.TryGetValue(id, out NetworkPlayer player))
+        {
+            player.username.text = username;
+        }
     }
 
     public void HandlePlayerLeft(Message message)
@@ -126,11 +170,6 @@ public class PlayerManager : MonoBehaviour
         if (_players.TryGetValue(id, out NetworkPlayer player))
         {
             player.transform.position = position;
-        }
-        else
-        {
-            NetworkPlayer newPlayer = Instantiate(proxyPlayer, position, quaternion.identity, transform);
-            _players.Add(id, newPlayer);
         }
     }
 }

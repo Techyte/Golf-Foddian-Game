@@ -24,8 +24,12 @@ public static class MessageExtensions
         message.AddUShort((ushort)value.Length);
         for (int i = 0; i < value.Length; i++)
         {
+            Debug.Log($"Adding value: {value[i].id} at: {i}");
+            Debug.Log($"Adding value: {value[i].position} at: {i}");
+            Debug.Log($"Adding value: {value[i].username} at: {i}");
             message.AddUShort(value[i].id);
             message.AddVector2(value[i].position);
+            message.AddString(value[i].username);
         }
              
         return message;
@@ -39,8 +43,10 @@ public static class MessageExtensions
 
         for (int i = 0; i < length; i++)
         {
+            playerData[0] = new NetworkPlayerData();
             playerData[i].id = message.GetUShort();
             playerData[i].position = message.GetVector2();
+            playerData[i].username = message.GetString();
         }
 
         return playerData;

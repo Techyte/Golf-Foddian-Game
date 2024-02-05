@@ -1,3 +1,4 @@
+using Riptide;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -39,6 +40,8 @@ public class PauseMenu : MonoBehaviour
             NetworkManager.Instance.client.Disconnect();
             NetworkManager.Instance.server.Stop();
             NetworkManager.Instance.playingOnline = false;
+            NetworkManager.Instance.server = new Server();
+            NetworkManager.Instance.client = new Client();
         }
         
         SceneManager.LoadScene("MainMenu");
