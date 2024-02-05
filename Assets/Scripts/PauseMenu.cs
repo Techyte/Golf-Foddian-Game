@@ -34,6 +34,13 @@ public class PauseMenu : MonoBehaviour
 
     public void Leave()
     {
+        if (NetworkManager.Instance.playingOnline)
+        {
+            NetworkManager.Instance.client.Disconnect();
+            NetworkManager.Instance.server.Stop();
+            NetworkManager.Instance.playingOnline = false;
+        }
+        
         SceneManager.LoadScene("MainMenu");
     }
 }

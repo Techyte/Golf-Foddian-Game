@@ -10,11 +10,11 @@ public class GolfBallController : MonoBehaviour
     [SerializeField] private float currentVelBonusMultiplier = 0.3f;
     [SerializeField] private Camera cam;
     [SerializeField] private float mouseDistanceAtMax= 10;
+    [SerializeField] private float volume = 0.5f;
+    [SerializeField] private bool soundEffects = true;
     [SerializeField] private List<AudioSource> ballHitSounds;
     [SerializeField] private List<AudioSource> ballBounceSounds;
     [SerializeField] private float bounceForce = 20;
-
-    public int ballHits;
 
     public float MaxPushForce => maxPushForce;
 
@@ -37,6 +37,18 @@ public class GolfBallController : MonoBehaviour
     private void Start()
     {
         mouseDistanceAtMax = PlayerPrefs.GetFloat("MouseDistanceAtMax");
+        volume = PlayerPrefs.GetFloat("Volume", 0.5f);
+        soundEffects = PlayerPrefs.GetInt("SoundEffects", 1) == 1;
+
+        foreach (var sound in ballHitSounds)
+        {
+            sound.volume = volume;
+        }
+        
+        foreach (var sound in ballBounceSounds)
+        {
+            sound.volume = volume;
+        }
     }
 
     private void Update()
@@ -76,13 +88,19 @@ public class GolfBallController : MonoBehaviour
 
     private void PlayHitSound()
     {
-        int id = Random.Range(0, ballHitSounds.Count);
-        ballHitSounds[id].Play();
+        if(soundEffects)
+        {
+            int id = Random.Range(0, ballHitSounds.Count);
+            ballHitSounds[id].Play();
+        }
     }
 
     private void PlayBounce()
     {
-        ballBounceSounds[0].Play();
+        if(soundEffects)
+        {
+            ballBounceSounds[0].Play();
+        }
     }
 
     private void FixedUpdate()
@@ -143,8 +161,6 @@ public class GolfBallController : MonoBehaviour
 
     private void PushBall()
     {
-        ballHits++;
-        
         float mag = dir.magnitude;
         
         dir.Normalize();
