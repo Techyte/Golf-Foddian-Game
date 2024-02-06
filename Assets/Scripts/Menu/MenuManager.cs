@@ -1,4 +1,5 @@
-using System;
+namespace Menu
+{
 using Multiplayer;
 using TMPro;
 using UnityEngine;
@@ -81,32 +82,32 @@ public class MenuManager : MonoBehaviour
         }
     }
 
-    public void UsernameChanged(string value)
+    private void UsernameChanged(string value)
     {
         PlayerPrefs.SetString("Username", value);
     }
 
-    public void DistanceChanged(float value)
+    private void DistanceChanged(float value)
     {
         PlayerPrefs.SetFloat("MouseDistanceAtMax", value);
     }
 
-    public void VolumeChanged(float value)
+    private void VolumeChanged(float value)
     {
         PlayerPrefs.SetFloat("Volume", value);
     }
     
-    public void MusicChanged(bool value)
+    private void MusicChanged(bool value)
     {
         PlayerPrefs.SetInt("Music", value ? 1 : 0);
     }
     
-    public void SoundEffectsChanged(bool value)
+    private void SoundEffectsChanged(bool value)
     {
         PlayerPrefs.SetInt("SoundEffects", value ? 1 : 0);
     }
     
-    public void BackgroundChanged(bool value)
+    private void BackgroundChanged(bool value)
     {
         PlayerPrefs.SetInt("Background", value ? 1 : 0);
         showBackground = value;
@@ -171,4 +172,5 @@ public class MenuManager : MonoBehaviour
     {
         SceneManager.LoadScene("Game");
     }
+}   
 }

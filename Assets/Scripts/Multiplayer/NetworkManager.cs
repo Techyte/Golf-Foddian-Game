@@ -27,11 +27,11 @@ namespace Multiplayer
     {
         public static NetworkManager Instance;
 
-        private ushort maxCLientCount = 10;
+        private ushort maxClientCount = 10;
 
         public Server server = new Server();
         public Client client = new Client();
-        private ushort port;
+        private ushort _port;
 
         public bool playingOnline;
         public bool host;
@@ -54,30 +54,30 @@ namespace Multiplayer
             host = true;
             server = new Server();
             client = new Client();
-            port = FreeTcpPort();
+            _port = FreeTcpPort();
 
             server.ClientConnected += (sender, args) =>
             {
-                PlayerManager.Instace.SendCurrentPlayers(args.Client.Id);   
-                PlayerManager.Instace.PlayerJoined(args.Client.Id);
+                PlayerManager.Instance.SendCurrentPlayers(args.Client.Id);   
+                PlayerManager.Instance.PlayerJoined(args.Client.Id);
                 
                 Message message = Message.Create(MessageSendMode.Reliable, ServerToPlayer.Port);
-                message.AddUShort(port);
+                message.AddUShort(_port);
                 server.Send(message, args.Client.Id);
             };
             
             server.ClientDisconnected += (sender, args) =>
             {
-                PlayerManager.Instace.PlayerLeft(args.Client.Id);
+                PlayerManager.Instance.PlayerLeft(args.Client.Id);
             };
             
             client.Connected += (sender, args) =>
             {
-                PlayerManager.Instace.SelfConnected(client.Id);
+                PlayerManager.Instance.SelfConnected(client.Id);
             };
             
-            server.Start(port, maxCLientCount);
-            client.Connect($"127.0.0.1:{port}");
+            server.Start(_port, maxClientCount);
+            client.Connect($"127.0.0.1:{_port}");
             SceneManager.LoadScene("Online");
         }
 
@@ -130,37 +130,37 @@ namespace Multiplayer
         [MessageHandler((ushort)ServerToPlayer.CurrentPlayers)]
         private static void CurrentPlayers(Message message)
         {
-            PlayerManager.Instace.HandleCurrentPlayers(message.GetPlayerInfos());
+            PlayerManager.Instance.HandleCurrentPlayers(message.GetPlayerInfos());
         }
 
         [MessageHandler((ushort)ServerToPlayer.PlayerJoined)]
         private static void PlayerJoined(Message message)
         {
-            PlayerManager.Instace.HandNewPlayer(message);
+            PlayerManager.Instance.HandNewPlayer(message);
         }
 
         [MessageHandler((ushort)ServerToPlayer.PlayerLeft)]
         private static void PlayerLeft(Message message)
         {
-            PlayerManager.Instace.HandlePlayerLeft(message);
+            PlayerManager.Instance.HandlePlayerLeft(message);
         }
 
         [MessageHandler((ushort)ServerToPlayer.PlayerLocation)]
         private static void NewPlayerLocation(Message message)
         {
-            PlayerManager.Instace.NewPlayerLocation(message.GetUShort(), message.GetVector2());
+            PlayerManager.Instance.NewPlayerLocation(message.GetUShort(), message.GetVector2());
         }
 
         [MessageHandler((ushort)ServerToPlayer.Port)]
         private static void Port(Message message)
         {
-            PlayerManager.Instace.port = message.GetUShort();
+            PlayerManager.Instance.port = message.GetUShort();
         }
 
         [MessageHandler((ushort)ServerToPlayer.Username)]
         private static void Username(Message message)
         {
-            PlayerManager.Instace.SetPlayerUsername(message.GetUShort(), message.GetString());
+            PlayerManager.Instance.SetPlayerUsername(message.GetUShort(), message.GetString());
         }
 
         [MessageHandler((ushort)PlayerToServer.Location)]
@@ -180,7 +180,7 @@ namespace Multiplayer
         {
             string username = message.GetString();
             
-            PlayerManager.Instace.SetPlayerUsername(fromPlayerId, username);
+            PlayerManager.Instance.SetPlayerUsername(fromPlayerId, username);
             
             Message forwardMessage = Message.Create(MessageSendMode.Unreliable, ServerToPlayer.Username);
             forwardMessage.AddUShort(fromPlayerId);

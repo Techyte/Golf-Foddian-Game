@@ -35940,55 +35940,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1805320782}
   m_CullTransparentMesh: 1
---- !u!1 &1809488828
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1809488830}
-  - component: {fileID: 1809488829}
-  m_Layer: 0
-  m_Name: TemperatureManager
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &1809488829
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1809488828}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 854aa6a3bff0b3d4c95abc2aebc9889c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  volume: {fileID: 557643731}
-  player: {fileID: 4921640}
-  threshold: 15
-  minHeight: -4
-  maxHeight: 15
---- !u!4 &1809488830
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1809488828}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1840609469
 GameObject:
   m_ObjectHideFlags: 0
@@ -37771,7 +37722,6 @@ SceneRoots:
   - {fileID: 613403687}
   - {fileID: 2058770168}
   - {fileID: 557643732}
-  - {fileID: 1809488830}
   - {fileID: 2033840597}
   - {fileID: 987351752}
   - {fileID: 57391312}

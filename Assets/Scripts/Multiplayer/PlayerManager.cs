@@ -8,7 +8,7 @@ namespace Multiplayer
 
     public class PlayerManager : MonoBehaviour
     {
-        public static PlayerManager Instace;
+        public static PlayerManager Instance;
 
         [SerializeField] private Transform playerStartPosition;
         [SerializeField] private NetworkPlayer proxyPlayer;
@@ -23,7 +23,7 @@ namespace Multiplayer
         
         private void Awake()
         {
-            Instace = this;
+            Instance = this;
         }
 
         private void Start()
@@ -46,7 +46,7 @@ namespace Multiplayer
             }
         }
 
-        public void SendLocationAsClient()
+        private void SendLocationAsClient()
         {
             Message message = Message.Create(MessageSendMode.Unreliable, PlayerToServer.Location);
 
@@ -116,17 +116,18 @@ namespace Multiplayer
         
         public void HandleCurrentPlayers(NetworkPlayerData[] datas)
         {
-            Debug.Log("setuping up existing players");
-            for (int i = 0; i < datas.Length; i++)
+            Debug.Log("setting up existing players");
+
+            foreach (var data in datas)
             {
                 Debug.Log("setuping up AN existing player");
-                Debug.Log(datas[i].id);
-                if (!_players.ContainsKey(datas[i].id))
+                Debug.Log(data.id);
+                if (!_players.ContainsKey(data.id))
                 {
-                    Debug.Log(datas[i].username);
-                    ushort id = datas[i].id;
-                    NetworkPlayer newPlayer = Instantiate(proxyPlayer, datas[i].position, quaternion.identity, transform);
-                    newPlayer.username.text = datas[i].username;
+                    Debug.Log(data.username);
+                    ushort id = data.id;
+                    NetworkPlayer newPlayer = Instantiate(proxyPlayer, data.position, quaternion.identity, transform);
+                    newPlayer.username.text = data.username;
                     newPlayer.id = id;
                 
                     _players.Add(id, newPlayer);
