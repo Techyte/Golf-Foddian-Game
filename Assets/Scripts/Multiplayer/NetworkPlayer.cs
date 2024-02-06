@@ -1,15 +1,18 @@
-﻿using TMPro;
-using UnityEngine;
-
-public class NetworkPlayer : MonoBehaviour
+﻿namespace Multiplayer
 {
-    public ushort id;
-    public TextMeshPro username;
-}
+    using TMPro;
+    using UnityEngine;
 
-public class NetworkPlayerData
-{
-    public ushort id;
-    public Vector2 position;
-    public string username;
+    public class NetworkPlayer : MonoBehaviour
+    {
+        public ushort id;
+        public TextMeshPro username;
+    }
+
+    public class NetworkPlayerData
+    {
+        public ushort id;
+        public Vector2 position;
+        public string username;
+    }   
 }
