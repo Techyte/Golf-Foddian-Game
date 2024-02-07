@@ -48,9 +48,13 @@ namespace Cosmetics
             SkinCosmetic[] skinCosmetics = Resources.LoadAll<SkinCosmetic>("Cosmetics/Skin");
             BodyCosmetic[] bodyCosmetics = Resources.LoadAll<BodyCosmetic>("Cosmetics/Body");
 
+            HatCosmeticType savedHatType = (HatCosmeticType)PlayerPrefs.GetInt("PlayerHat", (int)HatCosmeticType.Default);
+            SkinCosmeticType savedSkinType = (SkinCosmeticType)PlayerPrefs.GetInt("PlayerSkin", (int)SkinCosmeticType.Default);
+            BodyCosmeticType savedBodyType = (BodyCosmeticType)PlayerPrefs.GetInt("PlayerBody", (int)BodyCosmeticType.Default);
+
             for (int i = 0; i < hatCosmetics.Length; i++)
             {
-                if (hatCosmetics[i].type == HatCosmeticType.Default)
+                if (hatCosmetics[i].type == savedHatType)
                 {
                     _currentHatSelection = i;
                 }
@@ -60,7 +64,7 @@ namespace Cosmetics
             
             for (int i = 0; i < skinCosmetics.Length; i++)
             {
-                if (skinCosmetics[i].type == SkinCosmeticType.Default)
+                if (skinCosmetics[i].type == savedSkinType)
                 {
                     _currentSkinSelection = i;
                 }
@@ -70,7 +74,7 @@ namespace Cosmetics
             
             for (int i = 0; i < bodyCosmetics.Length; i++)
             {
-                if (bodyCosmetics[i].type == BodyCosmeticType.Default)
+                if (bodyCosmetics[i].type == savedBodyType)
                 {
                     _currentBodySelection = i;
                 }
@@ -79,6 +83,21 @@ namespace Cosmetics
             }
             
             ReloadAll();
+        }
+
+        public HatCosmetic GetCurrentHat()
+        {
+            return GetHatCosmetic(_hatSelection[_currentHatSelection].type);
+        }
+
+        public SkinCosmetic GetCurrentSkin()
+        {
+            return GetSkinCosmetic(_skinSelection[_currentSkinSelection].type);
+        }
+
+        public BodyCosmetic GetCurrentBody()
+        {
+            return GetBodyCosmetic(_bodySelection[_currentBodySelection].type);
         }
 
         public HatCosmetic GetHatCosmetic(HatCosmeticType hatType)
@@ -211,35 +230,17 @@ namespace Cosmetics
                 Color color = hatDisplay.color;
                 color.a = 255;
                 hatDisplay.color = color;
-
-                Vector3 newScale = new Vector3();
-            
-                newScale.x = _hatSelection[_currentHatSelection].texture.bounds.extents.x * 2;
-                newScale.y = _hatSelection[_currentHatSelection].texture.bounds.extents.y * 2;
-
-                newScale *= hatSizeMultiplier;
-                
-                hatDisplay.transform.localScale = newScale;
-
-                Vector3 newPosition = originalHatDisplayPos.position;
-                newPosition.y += _hatSelection[_currentHatSelection].yOffset;
-                hatDisplay.transform.position = newPosition;
             }
             hatDisplay.sprite = _hatSelection[_currentHatSelection].texture;
+            
+            PlayerPrefs.SetInt("PlayerHat", (int)_hatSelection[_currentHatSelection].type);
         }
 
         private void ReloadSkin()
         {
             skinDisplay.sprite = _skinSelection[_currentSkinSelection].texture;
-
-            Vector3 newScale = new Vector3();
             
-            newScale.x = _skinSelection[_currentSkinSelection].texture.bounds.extents.x * 2;
-            newScale.y = _skinSelection[_currentSkinSelection].texture.bounds.extents.y * 2;
-            
-            newScale *= skinSizeMultiplier;
-
-            skinDisplay.transform.localScale = newScale;
+            PlayerPrefs.SetInt("PlayerSkin", (int)_skinSelection[_currentSkinSelection].type);
         }
 
         private void ReloadBody()
@@ -255,17 +256,10 @@ namespace Cosmetics
                 Color color = bodyDisplay.color;
                 color.a = 255;
                 bodyDisplay.color = color;
-
-                Vector3 newScale = new Vector3();
-            
-                newScale.x = _bodySelection[_currentBodySelection].texture.bounds.extents.x * 2;
-                newScale.y = _bodySelection[_currentBodySelection].texture.bounds.extents.y * 2;
-
-                newScale *= bodySizeMultiplier;
-
-                bodyDisplay.transform.localScale = newScale;
             }
             bodyDisplay.sprite = _bodySelection[_currentBodySelection].texture;
+            
+            PlayerPrefs.SetInt("PlayerBody", (int)_bodySelection[_currentBodySelection].type);
         }
 
         private void ReloadAll()

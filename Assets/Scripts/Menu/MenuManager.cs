@@ -27,6 +27,7 @@ public class MenuManager : MonoBehaviour
     [SerializeField] private Toggle Music;
     [SerializeField] private Toggle SoundEffects;
     [SerializeField] private Toggle Background;
+    [SerializeField] private Toggle Fullscreen;
 
     [Space] 
     [Header("Join Menu Assignments")] 
@@ -46,8 +47,13 @@ public class MenuManager : MonoBehaviour
         bool music = PlayerPrefs.GetInt("Music", 1) == 1;
         bool soundEffects = PlayerPrefs.GetInt("SoundEffects", 1) == 1;
         bool background = PlayerPrefs.GetInt("Background", 1) == 1;
+        bool fullscreen = PlayerPrefs.GetInt("Fullscreen", 1) == 1;
 
         showBackground = background;
+
+        Screen.fullScreen = fullscreen;
+        
+        Fullscreen.onValueChanged.AddListener(FullscreenChanged);
 
         usernameInputField.contentType = TMP_InputField.ContentType.Standard;
         usernameInputField.text = username;
@@ -111,6 +117,12 @@ public class MenuManager : MonoBehaviour
     {
         PlayerPrefs.SetInt("Background", value ? 1 : 0);
         showBackground = value;
+    }
+    
+    private void FullscreenChanged(bool value)
+    {
+        PlayerPrefs.SetInt("FullScreen", value ? 1 : 0);
+        Screen.fullScreen = value;
     }
 
     public void OpenMain()

@@ -1,3 +1,5 @@
+using Cosmetics;
+
 namespace Multiplayer
 {
     using System.Net;
@@ -108,6 +110,9 @@ namespace Multiplayer
             {
                 Message message = Message.Create(MessageSendMode.Reliable, PlayerToServer.Username);
                 message.AddString(PlayerPrefs.GetString("Username", "Guest"));
+                message.AddInt((int)CosmeticManager.Instance.GetCurrentHat().type);
+                message.AddInt((int)CosmeticManager.Instance.GetCurrentSkin().type);
+                message.AddInt((int)CosmeticManager.Instance.GetCurrentBody().type);
                 client.Send(message);
             };
         }
@@ -160,7 +165,7 @@ namespace Multiplayer
         [MessageHandler((ushort)ServerToPlayer.Username)]
         private static void Username(Message message)
         {
-            PlayerManager.Instance.SetPlayerUsername(message.GetUShort(), message.GetString());
+            PlayerManager.Instance.SetPlayerUsername(message.GetUShort(), message.GetString(), (HatCosmeticType)message.GetInt(), (SkinCosmeticType)message.GetInt(), (BodyCosmeticType)message.GetInt());
         }
 
         [MessageHandler((ushort)PlayerToServer.Location)]
@@ -179,12 +184,18 @@ namespace Multiplayer
         private static void PlayerUsername(ushort fromPlayerId, Message message)
         {
             string username = message.GetString();
+            HatCosmeticType hat = (HatCosmeticType)message.GetInt();
+            SkinCosmeticType skin = (SkinCosmeticType)message.GetInt();
+            BodyCosmeticType body = (BodyCosmeticType)message.GetInt();
             
-            PlayerManager.Instance.SetPlayerUsername(fromPlayerId, username);
+            PlayerManager.Instance.SetPlayerUsername(fromPlayerId, username, hat, skin, body);
             
             Message forwardMessage = Message.Create(MessageSendMode.Unreliable, ServerToPlayer.Username);
             forwardMessage.AddUShort(fromPlayerId);
             forwardMessage.AddString(username);
+            forwardMessage.AddInt((int)hat);
+            forwardMessage.AddInt((int)skin);
+            forwardMessage.AddInt((int)body);
             
             Instance.server.SendToAll(forwardMessage, fromPlayerId);
         }

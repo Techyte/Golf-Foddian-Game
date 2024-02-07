@@ -1,3 +1,5 @@
+using Cosmetics;
+
 namespace Multiplayer
 {
     using System.Collections.Generic;
@@ -60,6 +62,9 @@ namespace Multiplayer
             Debug.Log("adding self to players");
             localPlayer.id = id;
             localPlayer.username.text = PlayerPrefs.GetString("Username", "Guest");
+            localPlayer.hat = CosmeticManager.Instance.GetCurrentHat();
+            localPlayer.skin = CosmeticManager.Instance.GetCurrentSkin();
+            localPlayer.body = CosmeticManager.Instance.GetCurrentBody();
             _players.Add(id, localPlayer);
             Debug.Log($"Adding {id} to players");
         }
@@ -80,6 +85,9 @@ namespace Multiplayer
                 data.id = player.id;
                 data.position = player.transform.position;
                 data.username = player.username.text;
+                data.hat = player.hat;
+                data.skin = player.skin;
+                data.body = player.body;
                 
                 playerData.Add(data);
             }
@@ -129,6 +137,11 @@ namespace Multiplayer
                     NetworkPlayer newPlayer = Instantiate(proxyPlayer, data.position, quaternion.identity, transform);
                     newPlayer.username.text = data.username;
                     newPlayer.id = id;
+                    newPlayer.hat = data.hat;
+                    newPlayer.skin = data.skin;
+                    newPlayer.body = data.body;
+                    
+                    newPlayer.SetCosmetics();
                 
                     _players.Add(id, newPlayer);
                     Debug.Log($"Adding {id} to players");
@@ -150,11 +163,15 @@ namespace Multiplayer
             Debug.Log($"Adding {id} to players");
         }
 
-        public void SetPlayerUsername(ushort id, string username)
+        public void SetPlayerUsername(ushort id, string username, HatCosmeticType hat, SkinCosmeticType skin, BodyCosmeticType body)
         {
             if (_players.TryGetValue(id, out NetworkPlayer player))
             {
                 player.username.text = username;
+                player.hat = CosmeticManager.Instance.GetHatCosmetic(hat);
+                player.skin = CosmeticManager.Instance.GetSkinCosmetic(skin);
+                player.body = CosmeticManager.Instance.GetBodyCosmetic(body);
+                player.SetCosmetics();
             }
         }
 

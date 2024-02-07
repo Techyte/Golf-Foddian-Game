@@ -13,6 +13,15 @@ namespace Multiplayer
         public SkinCosmetic skin;
         public HatCosmetic hat;
         public BodyCosmetic body;
+
+        [SerializeField] private PlayerCosmeticManager cosmeticManager;
+
+        public void SetCosmetics()
+        {
+            cosmeticManager.SetHat(hat);
+            cosmeticManager.SetSkin(skin);
+            cosmeticManager.SetBody(body);
+        }
     }
 
     public class NetworkPlayerData

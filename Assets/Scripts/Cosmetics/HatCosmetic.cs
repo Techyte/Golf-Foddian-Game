@@ -7,6 +7,9 @@
     {
         public Sprite texture;
         public HatCosmeticType type;
-        public float yOffset;
+        [Space]
+        [Header("Offsets")]
+        public float x;
+        public float y;
     }
 }

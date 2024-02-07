@@ -1,4 +1,6 @@
-﻿namespace Multiplayer
+﻿using Cosmetics;
+
+namespace Multiplayer
 {
     using Riptide;
     using UnityEngine;
@@ -32,6 +34,9 @@
                 message.AddUShort(value[i].id);
                 message.AddVector2(value[i].position);
                 message.AddString(value[i].username);
+                message.AddInt((int)value[i].hat.type);
+                message.AddInt((int)value[i].skin.type);
+                message.AddInt((int)value[i].body.type);
             }
                  
             return message;
@@ -49,6 +54,9 @@
                 playerData[i].id = message.GetUShort();
                 playerData[i].position = message.GetVector2();
                 playerData[i].username = message.GetString();
+                playerData[i].hat = CosmeticManager.Instance.GetHatCosmetic((HatCosmeticType)message.GetInt());
+                playerData[i].skin = CosmeticManager.Instance.GetSkinCosmetic((SkinCosmeticType)message.GetInt());
+                playerData[i].body = CosmeticManager.Instance.GetBodyCosmetic((BodyCosmeticType)message.GetInt());
             }
 
             return playerData;

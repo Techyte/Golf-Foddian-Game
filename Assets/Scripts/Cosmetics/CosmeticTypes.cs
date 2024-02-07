@@ -1,6 +1,6 @@
 namespace Cosmetics
 {
-    public enum SkinCosmeticType
+    public enum SkinCosmeticType : int
     {
         Default,
         Amongus,
@@ -9,7 +9,7 @@ namespace Cosmetics
         Blue
     }
     
-    public enum HatCosmeticType
+    public enum HatCosmeticType : int
     {
         Default,
         Goku,
@@ -18,7 +18,7 @@ namespace Cosmetics
         TopHat
     }
     
-    public enum BodyCosmeticType
+    public enum BodyCosmeticType : int
     {
         Default,
         Monacle,
