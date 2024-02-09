@@ -6,7 +6,9 @@ namespace Cosmetics
         Amongus,
         Cookie,
         Soviet,
-        Blue
+        Blue,
+        America,
+        France
     }
     
     public enum HatCosmeticType : int
